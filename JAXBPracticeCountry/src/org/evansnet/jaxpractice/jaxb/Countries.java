@@ -22,7 +22,7 @@ public class Countries {
 	
 	private static Logger javaLogger = Logger.getLogger("CountriesLogger");
 	private List<Country> countries;
-	private static String[] fieldNames = {"Name", "Capital", "Continent", "Population"}; 
+	private static String[] fieldNames = {"Name", "Capital", "Founded", "Continent", "Population"}; 
 	
 	public Countries() {
 		countries = new ArrayList<Country>();

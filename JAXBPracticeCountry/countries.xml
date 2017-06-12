@@ -3,16 +3,22 @@
     <Country>
         <Country_Name>Spain</Country_Name>
         <Country_Capital>Madrid</Country_Capital>
+		<Country_Founded>1469-10-19</Country_Founded>
         <Country_Continent>Europe</Country_Continent>
+		<Country_Population>45600000</Country_Population>
     </Country>
-    <Country>
+	<Country>
         <Country_Name>USA</Country_Name>
         <Country_Capital>Washington</Country_Capital>
+		<Country_Founded>1776-07-04</Country_Founded>
         <Country_Continent>America</Country_Continent>
+		<Country_Population>321400000</Country_Population>
     </Country>
     <Country>
         <Country_Name>Japan</Country_Name>
         <Country_Capital>Tokyo</Country_Capital>
+		<Country_Founded>1000-01-10</Country_Founded>
         <Country_Continent>Asia</Country_Continent>
+		<Country_Population>127000000</Country_Population>
     </Country>
 </Countries>

@@ -48,6 +48,7 @@ public class CountriesTableModel extends AbstractTableModel {
 			fields = new Vector<String>();
 			fields.add(c.getName());
 			fields.add(c.getCapital());
+			fields.add(c.getFoundation().toString());
 			fields.add(c.getContinent());
 			fields.add(String.valueOf(c.getPopulation()));
 			countryData.add(fields);
