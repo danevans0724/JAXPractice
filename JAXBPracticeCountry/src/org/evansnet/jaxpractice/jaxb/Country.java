@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -16,6 +17,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+
+import org.xml.sax.SAXException;
 
 /**
  * This class is for JAXB marshalling practice. It is taken from 
@@ -37,10 +42,15 @@ public class Country {
 	String continent = "";
 	int population;
 	String[] fieldNames = {"Name", "Capital", "Founded", "Continent", "Population" };
+	Schema countrySchema;
 	
-	public Country() {}
+	public Country() throws SAXException {
+		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		countrySchema = sf.newSchema(new File("CountryLSchema.xsd"));
+	}
 	
 	public Country(String n, String cap, LocalDate f, String cn, int p) {
+		super();
 		name = n;
 		capital = cap;
 		foundation = f;
@@ -139,7 +149,12 @@ public class Country {
 	 * @param File fileName
 	 */
 	public Country unMarshallCounty(File fileName) {
-		Country country = new Country();
+		Country country = null;
+		try {
+			country = new Country();
+		} catch (SAXException e) {
+		e.printStackTrace();
+		}
 		JAXBContext jaxbContext;
 		try {
 			jaxbContext = JAXBContext.newInstance(Country.class);
@@ -174,7 +189,7 @@ public class Country {
 	
 	
 
- public static void main(String[] args) {
+ public static void main(String[] args) throws SAXException {
 	 
 	 // Test the class.
 		Country spain = new Country();

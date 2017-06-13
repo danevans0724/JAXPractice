@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JTable;
 import org.evansnet.jaxpractice.jaxb.Countries;
 import org.evansnet.jaxpractice.jaxb.Country;
+import org.xml.sax.SAXException;
 
 /**
  * A simple practice class that contains a table and un-marshalls country
@@ -38,7 +39,11 @@ public class CountriesWindow {
 	 */
 	public CountriesWindow() {
 		countries = new Countries();
-		country = new Country();
+		try {
+			country = new Country();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		}
 		tableModel = new CountriesTableModel();
 		initialize();
 	}
