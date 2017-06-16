@@ -1,6 +1,7 @@
 package org.evansnet.jaxpractice.jaxb;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDate;
 import java.util.logging.Level;
@@ -11,15 +12,19 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Validator;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.bind.util.JAXBSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.evansnet.jaxpractice.jaxb.err.CountryErrorHandler;
+import org.evansnet.jaxpractice.jaxb.err.CountryValidationHandler;
 import org.xml.sax.SAXException;
 
 /**
@@ -43,10 +48,13 @@ public class Country {
 	int population;
 	String[] fieldNames = {"Name", "Capital", "Founded", "Continent", "Population" };
 	Schema countrySchema;
+	Validator validator;
 	
 	public Country() throws SAXException {
 		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		countrySchema = sf.newSchema(new File("CountryLSchema.xsd"));
+		validator = countrySchema.newValidator();
+		validator.setErrorHandler(new CountryErrorHandler());
 	}
 	
 	public Country(String n, String cap, LocalDate f, String cn, int p) {
@@ -105,14 +113,14 @@ public class Country {
 		return this.continent;
 	}
 	
-	@XmlAttribute( name = "importance", required = true)
-	public void setImportance(int importance) {
-		this.importance = importance;
-	}
-	
-	public int getImportance() {
-		return this.importance;
-	}
+//	@XmlAttribute( name = "importance", required = true)
+//	public void setImportance(int importance) {
+//		this.importance = importance;
+//	}
+//	
+//	public int getImportance() {
+//		return this.importance;
+//	}
 	
 	/**
 	 * Provide the list of fields that describe a country.
@@ -120,6 +128,25 @@ public class Country {
 	 */
 	public String[] getFieldNames() {
 		return fieldNames;
+	}
+	
+	/**
+	 * Validates the country source provided against a schema
+	 * @return True if the source structure conforms to the schema, false otherwise.
+	 * @throws JAXBException 
+	 */
+	private boolean isValidCountry(JAXBContext context) throws JAXBException {
+		JAXBSource source = new JAXBSource(context, this);
+		try {
+			validator.validate(source);
+		} catch (SAXException e) {
+			e.printStackTrace();
+			return false;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -129,10 +156,17 @@ public class Country {
 		JAXBContext jaxbContext;
 		try {
 			jaxbContext = JAXBContext.newInstance(Country.class);
+			if (!isValidCountry(jaxbContext)) {
+				throw new JAXBException("The definition supplied failed to validate");
+			}
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 			
 			// Set this flag to true to format the output.
 			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			jaxbMarshaller.setSchema(countrySchema);
+			
+			//Set the validation event handler
+			jaxbMarshaller.setEventHandler(new CountryValidationHandler());
 			
 			// marshalling of java objects in xml (output to file and stdout)
 			jaxbMarshaller.marshal(this, new File("country.xml"));
@@ -159,6 +193,7 @@ public class Country {
 		try {
 			jaxbContext = JAXBContext.newInstance(Country.class);
 			Unmarshaller jaxbUnMarshaller = jaxbContext.createUnmarshaller();
+			
 			country = (Country) jaxbUnMarshaller.unmarshal(fileName);
 		} catch (JAXBException jbx) {
 			javalogger.log(Level.SEVERE, "An exception happened while un-marshalling "
@@ -186,14 +221,12 @@ public class Country {
 			return LocalDate.parse(v);
 		}
 	}
-	
-	
 
  public static void main(String[] args) throws SAXException {
 	 
 	 // Test the class.
 		Country spain = new Country();
-		spain.setImportance(1);
+//		spain.setImportance(1);
 		spain.setName("Spain");
 		spain.setCapital("Madrid");
 		spain.setContinent("Europe");
@@ -211,7 +244,7 @@ public class Country {
 		
 		//Show the new un-marshalled content
 		System.out.println("\n****** Showing un-marshalled content ******");
-		System.out.println("Importance: " + unMarshalledSpain.importance);
+//		System.out.println("Importance: " + unMarshalledSpain.importance);
 		System.out.println("Name: " + unMarshalledSpain.name);
 		System.out.println("Capital: " + unMarshalledSpain.capital);
 		System.out.println("Founded: " + unMarshalledSpain.foundation.toString());

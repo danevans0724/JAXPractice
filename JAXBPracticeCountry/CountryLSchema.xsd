@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:attribute name="importance">
+		<xs:simpleType>
+			<xs:restriction base="xs:int">
+				<xs:pattern value="0|1|2|3"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
 	<xs:simpleType name="continentType">
 		<xs:restriction base="xs:string">
 			<xs:pattern value="Asia|Europe|America|Africa|Oceana"/>
@@ -13,7 +20,7 @@
 				minOccurs="1" />
 			<xs:element name="Country_Capital" type="xs:string"
 				minOccurs="1" />
-			<xs:element name="Country_Foundation_Date" type="xs:string"
+			<xs:element name="Country_Founded" type="xs:string"
 				minOccurs="1" />
 			<xs:element name="Country_Continent" type="xs:string"
 				minOccurs="1" />
